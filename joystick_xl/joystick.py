@@ -256,8 +256,12 @@ class Joystick:
 
         # Send the USB HID report if required.
         if always or self._last_report != self._report:
-            self._device.send_report(self._report)
-            self._last_report[:] = self._report
+            try:
+                self._device.send_report(self._report)
+                self._last_report[:] = self._report
+            except OSError:
+                #This can occur if the USB is busy, so drop the update and try later
+                pass
 
     def reset_all(self) -> None:
         """Reset all inputs to their idle states."""
